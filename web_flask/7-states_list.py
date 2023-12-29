@@ -5,9 +5,10 @@ A script that starts a Flask web application:
     -> Routes:
         /states_list: display a HTML page: (inside the tag BODY)
             => H1 tag: “States”
-            => UL tag: with the list of all State objects present 
+            => UL tag: with the list of all State objects present
                in DBStorage sorted by name (A->Z)
-                => LI tag: description of one State: <state.id>: <B><state.name></B>
+                => LI tag: description of one State:
+                           <state.id>: <B><state.name></B>
 """
 from flask import Flask, render_template
 from sqlalchemy.sql.expression import text
