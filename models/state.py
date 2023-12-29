@@ -20,6 +20,24 @@ class State(BaseModel, Base):
     if getenv("HBNB_TYPE_STORAGE") != "db":
         @property
         def cities(self):
+            """
+            Retrieves a list of cities associated with the current instance.
+
+            If the environment variable 'HBNB_TYPE_STORAGE' is not set to 'db',
+            this method retrieves cities by iterating through all City
+            instances stored in the models' storage and filtering them based
+            on the matching state_id with the current instance.
+
+            Returns:
+                list: A list of City instances associated with
+                      the current state.
+
+            Note:
+                This method assumes the existence of models.storage for data
+                retrieval.
+                If 'HBNB_TYPE_STORAGE' is set to 'db', it is expected to
+                retrieve cities from a database.
+            """
             city_list = []
             for city in list(models.storage.all(City).values()):
                 if city.state_id == self.id:
