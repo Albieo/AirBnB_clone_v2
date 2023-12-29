@@ -9,7 +9,7 @@ from models.review import Review
 from models.place import Place
 from models.state import State
 from models.user import User
-import os
+from os import getenv
 
 class DBStorage():
     """Manage the database for the HBNB project"""
@@ -17,55 +17,58 @@ class DBStorage():
     __session = None
 
     def __init__(self):
-        """create the engine"""
-        self.__engine = create_engine(
-            f"mysql+mysqldb://{os.getenv('HBNB_MYSQL_USER')}:{os.getenv('HBNB_MYSQL_PWD')}@{os.getenv('HBNB_MYSQL_HOST')}/{os.getenv('HBNB_MYSQL_DB')}",
-            pool_pre_ping=True
-        )
-        self.__session = sessionmaker(bind=self.__engine)()
+        user = getenv('HBNB_MYSQL_USER')
+        password = getenv('HBNB_MYSQL_PWD')
+        host = getenv('HBNB_MYSQL_HOST')
+        db = getenv('HBNB_MYSQL_DB')
+        env = getenv('HBNB_ENV')
 
-        metadata = MetaData()
-        if os.getenv("HBNB_ENV") == "test":
-            metadata.drop_all(bind=self.__engine)
+        self.__engine = create_engine(
+            'mysql+mysqldb://{}:{}@{}/{}'.format(user, password, host, db),
+            pool_pre_ping=True)
+
+        if getenv("HBNB_ENV") == "test":
+            Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
-        """query all objects depending on the class name"""
-        data = {}
+        """Returns a dictionary of models currently in storage"""
+        my_dict = {}
         if cls:
-            query_class = globals().get(cls)
-            if query_class:
-                for element in self.__session.query(query_class).all():
-                    data[f"{cls}.{element.id}"] = element
+            if isinstance(cls, str):
+                cls = globals().get(cls)
+            query = self.__session.query(cls)
+            for value in query:
+                key = "{}.{}".format(type(value).__name__, value.id)
+                my_dict[key] = value
         else:
-            model_classes = [User, State, City, Amenity, Place, Review]
-            for model_class in model_classes:
-                for element in self.__session.query(model_class).all():
-                    data[f"{model_class.__name__}.{element.id}"] = element
-        return data
+            class_list = [State, City, User, Place, Review, Amenity]
+            for in_class in class_list:
+                query = self.__session.query(in_class)
+                for value in query:
+                    key = "{}.{}".format(type(value).__name__, value.id)
+                    my_dict[key] = value
+        return (my_dict)
 
     def new(self, obj):
-        """add the object to the current database session"""
+        """Adds new object to storage dictionary"""
         self.__session.add(obj)
 
     def save(self):
-        """commit all changes of the current database session"""
-        try:
-            self.__session.commit()
-        except Exception:
-            self.__session.rollback()
-            raise
-
-    def delete(self, obj=None):
-        """delete obj from the current database session"""
-        if obj:
-            self.__session.delete(obj)
+        """Saves storage dictionary to file"""
+        self.__session.commit()
 
     def reload(self):
-        """create all tables in the database and the current session"""
+        """Loads storage dictionary from file"""
         Base.metadata.create_all(self.__engine)
-        Session = scoped_session(sessionmaker(bind=self.__engine, expire_on_commit=False))
+        item = sessionmaker(bind=self.__engine, expire_on_commit=False)
+        Session = scoped_session(item)
         self.__session = Session()
- 
+
+    def delete(self, obj=None):
+        """ deletes an obj in the database """
+        if obj:
+            self.session.delete(obj)
+
     def close(self):
-        """Close the session"""
-        self.__session.remove()
+        """ closes the respective database """
+        self.__session.close()
