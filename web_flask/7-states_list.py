@@ -23,8 +23,8 @@ def states_list():
         UL tag: 'List of states in DBStorage'
     """
     from models import storage
-    all_data = storage.all()
-    sorted_states = sorted(all_data.values(), key=lambda state: state.name)
+    all_states = storage.all("State")
+    sorted_states = sorted(all_states.values(), key=lambda state: state.name)
 
     return render_template('7-states_list.html', states=sorted_states)
 
