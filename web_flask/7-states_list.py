@@ -11,7 +11,6 @@ A script that starts a Flask web application:
 """
 from flask import Flask, render_template
 from sqlalchemy.sql.expression import text
-from models import storage
 
 app = Flask(__name__)
 
@@ -23,6 +22,7 @@ def states_list():
         H1 tag: 'State'
         UL tag: 'List of states in DBStorage'
     """
+    from models import storage
     all_data = storage.all()
     sorted_states = sorted(all_data.values(), key=lambda state: state.name)
 
@@ -32,6 +32,7 @@ def states_list():
 @app.teardown_appcontext
 def teardown_storage(exception):
     """ Close the storage session after each request """
+    from models import storage
     storage.close()
 
 
