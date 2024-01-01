@@ -44,10 +44,11 @@ def states_id(id):
         H1 tag: 'State'
         H3 tag: 'Cities'
         UL tag: list of 'City' objects - State
-            LI tag: "City: <city.id>: <city.name>" 
+            LI tag: "City: <city.id>: <city.name>"
     """
     from models import storage
-    for state in sorted(storage.all("State").values(), key=lambda state: state.name):
+    for state in sorted(storage.all("State").values(),
+                        key=lambda state: state.name):
         if state.id == id:
             return render_template('9-states.html', state=state)
     return render_template('9-states.html')
