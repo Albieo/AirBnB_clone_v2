@@ -11,7 +11,6 @@ A script that starts a Flask web application:
                            <state.id>: <B><state.name></B>
 """
 from flask import Flask, render_template
-from sqlalchemy.sql.expression import text
 
 app = Flask(__name__)
 

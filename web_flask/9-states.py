@@ -3,25 +3,28 @@
 A script that starts a Flask web application:
     -> web application must be listening on 0.0.0.0, port 5000
     -> Routes:
-        /cities_by_states: display a HTML page: (inside the tag BODY)
+        /states: display a HTML page: (inside the tag BODY)
             => H1 tag: “States”
             => UL tag: with the list of all State objects present
                in DBStorage sorted by name (A->Z)
                 => LI tag: description of one State:
                            <state.id>: <B><state.name></B> +
-                   UL tag: with the list of City objects linked
-                           to the State sorted by name (A->Z)
-                      => LI tag: description of one
-                         City: <city.id>: <B><city.name></B>
+        /states/<id>: display a HTML page: (inside the tag BODY)
+            *** If State exist with id ***
+            => H1 tag: "State:"
+            => H3 tag: "Cities:"
+            => UL tag: list of City linked to State
+                => LI tag: City: <city.id>: <B><city.name></B>
+        Otherwise
+            H1 tag: "Not found"
 """
 from flask import Flask, render_template
-from sqlalchemy.sql.expression import text
 
 app = Flask(__name__)
 
 
-@app.route("/states_list", strict_slashes=False)
-def states_list():
+@app.route("/states", strict_slashes=False)
+def states():
     """
     display a HTML page:
         H1 tag: 'State'
@@ -31,7 +34,23 @@ def states_list():
     all_states = storage.all("State")
     sorted_states = sorted(all_states.values(), key=lambda state: state.name)
 
-    return render_template('7-states_list.html', states=sorted_states)
+    return render_template('9-states.html', states=sorted_states)
+
+
+@app.route("/states/<id>", strict_slashes=False)
+def states_id(id):
+    """
+    display a HTML page:
+        H1 tag: 'State'
+        H3 tag: 'Cities'
+        UL tag: list of 'City' objects - State
+            LI tag: "City: <city.id>: <city.name>" 
+    """
+    from models import storage
+    for state in sorted(storage.all("State").values(), key=lambda state: state.name):
+        if state.id == id:
+            return render_template('9-states.html', state=state)
+    return render_template('9-states.html')
 
 
 @app.teardown_appcontext
