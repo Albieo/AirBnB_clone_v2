@@ -23,9 +23,21 @@ from flask import Flask, render_template
 app = Flask(__name__)
 
 
-@app.route("/states", methods=['GET'], strict_slashes=False)
-@app.route("/states/<id>", methods=['GET'], strict_slashes=False)
-def states_id(id=None):
+@app.route("/states", strict_slashes=False)
+def states():
+    """
+    display a HTML page:
+        H1 tag: 'State'
+        UL tag: 'List of states in DBStorage'
+    """
+    from models import storage
+    all_states = storage.all("State")
+
+    return render_template('9-states.html', states=all_states)
+
+
+@app.route("/states/<id>", strict_slashes=False)
+def states_id(id):
     """
     display a HTML page:
         H1 tag: 'State'
@@ -34,20 +46,10 @@ def states_id(id=None):
             LI tag: "City: <city.id>: <city.name>"
     """
     from models import storage
-    if id is None:
-        all_states = storage.all("State")
-        sorted_states = sorted(all_states.values(), key=lambda x: x.name)
-        return render_template('9-states.html', states=sorted_states)
-
-    else:
-        state = storage.get("State", id)
-
-        if state is None:
-            return render_template('9-states.html', states=None)
-
-        cities = sorted(state.cities, key=lambda x: x.name)
-
-        return render_template('9-states.html', state=state, cities=cities)
+    for state in storage.all("State").values():
+        if state.id == id:
+            return render_template('9-states.html', state=state)
+    return render_template('9-states.html')
 
 
 @app.teardown_appcontext
