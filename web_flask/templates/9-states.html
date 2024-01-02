@@ -9,7 +9,7 @@
         <H3>Cities:</H3>
         <UL>
         {% for city in cities %}
-            <LI>{{ city.id }}: <b>{{ city.name }}</b></LI>
+            <LI>{{ city.id }}: <B>{{ city.name }}</B></LI>
         {% endfor %}
         </UL>
     {% else %}
@@ -17,7 +17,7 @@
             <H1>States</H1>
             <UL>
             {% for state_item in states %}
-                <LI>{{ state_item.id }}: <b>{{ state_item.name }}</b></LI>
+                <LI>{{ state_item.id }}: <B>{{ state_item.name }}</B></LI>
             {% endfor %}
             </UL>
         {% else %}

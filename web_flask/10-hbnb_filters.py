@@ -3,7 +3,7 @@
 A script that starts a Flask web application:
     -> web application must be listening on 0.0.0.0, port 5000
     -> Routes:
-        /cities_by_states: display a HTML page: (inside the tag BODY)
+        /hbnb_filters: display a HTML page: (inside the tag BODY)
             => H1 tag: “States”
             => UL tag: with the list of all State objects present
                in DBStorage sorted by name (A->Z)
@@ -19,21 +19,20 @@ from flask import Flask, render_template
 app = Flask(__name__)
 
 
-@app.route("/cities_by_states", strict_slashes=False)
-def cities_by_states():
+@app.route("/hbnb_filters", strict_slashes=False)
+def hbnb_filters():
     """
     display a HTML page:
-        H1 tag: 'State'
-        UL tag: 'List of states in DBStorage'
-            LI tag: "State: <state.id>: <state.name>
-            UL tag : 'List of City'
-                LI tag: "City: <city.id>: <city.name>"
+        The main HBnB filters HTML page"
     """
     from models import storage
     all_states = storage.all("State")
     sorted_states = sorted(all_states.values(), key=lambda state: state.name)
-
-    return render_template('8-cities_by_states.html', states=sorted_states)
+    all_amenities = storage.all("Amenity")
+    sorted_amenities = sorted(all_amenities.values(),
+                              key=lambda amenity: amenity.name)
+    return render_template('10-hbnb_filters.html',
+                           states=sorted_states, amenities=sorted_amenities)
 
 
 @app.teardown_appcontext

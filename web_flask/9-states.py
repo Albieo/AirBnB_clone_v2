@@ -44,7 +44,7 @@ def states_id(id=None):
 
         if state is None:
             return render_template('9-states.html', states=None)
-        
+
         cities = sorted(state.cities, key=lambda x: x.name)
 
         return render_template('9-states.html', state=state, cities=cities)
